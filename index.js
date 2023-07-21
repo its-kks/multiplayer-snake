@@ -2,7 +2,7 @@ const BG_COLOR = '#231f20';
 const SNAKE_COLOR = '#c2c2c2';
 const FOOD_COLOR = '#e66916';
 
-const gameScreen = document.getElementById('gameScreen');
+const gameScreen = document.querySelector('#gameScreen');
 let canvas, ctx;
 
 const init = () => {
@@ -17,7 +17,7 @@ const init = () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     document.addEventListener('keydown', (e) => {
-        console.log(e.keyCode);
+        console.log(e.key);
     });
 }
 
