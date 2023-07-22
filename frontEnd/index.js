@@ -5,6 +5,8 @@ const FOOD_COLOR = '#e66916';
 // // Making a client instance
 const socket = io('http://localhost:3000');
 socket.on('init',handleInit);
+socket.on('gameState',handleGameState)
+
 
 const gameScreen = document.querySelector('#gameScreen');
 let canvas, ctx;
@@ -39,6 +41,7 @@ const init = () => {
 
     document.addEventListener('keydown', (e) => {
         console.log(e.key);
+        socket.emit('keydown',e.key);
     });
 };
 
@@ -75,6 +78,6 @@ function handleInit(msg) {
 }
 
 function handleGameState(gameState){
-    gameState = JSON.parse(gameState);
+    gameState = JSON.parse(gameState);//since gameState will be received as a string
     requestAnimationFrame(()=>paintGame(gameState));
 }
