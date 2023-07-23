@@ -1,36 +1,71 @@
 const BG_COLOR = '#231f20';
 const SNAKE_COLOR = '#c2c2c2';
 const FOOD_COLOR = '#e66916';
+const SNAKE_COLOR2 = '#d45092';
 
 // // Making a client instance
 const socket = io('http://localhost:3000');
 socket.on('init',handleInit);
-socket.on('gameState',handleGameState)
-socket.on('gameOver',handleGameOver)
+socket.on('gameState',handleGameState);
+socket.on('gameOver',handleGameOver);
+socket.on('gameCode',handleGameCode);
+socket.on('unknownGame',handleUnknowGame);
+socket.on('tooManyPlayers',handleTooManyPlayers);
 
 
 
 const gameScreen = document.querySelector('#gameScreen');
 let canvas, ctx;
+let playerNumber;
+let gameActive = false;
+
+const initialScreen = document.querySelector('#initialScreen');
+const newGameButton = document.querySelector('#newGameButton');
+const joinGameButton = document.querySelector('#joinGameButton');
+const gameCodeInput = document.querySelector('#gameCodeInput');
+const gameCodeDisplay = document.querySelector('#gameCodeDisplay');
+
+newGameButton.addEventListener('click',newGame);
+joinGameButton.addEventListener('click',joinGame);
+
+function newGame(){
+    socket.emit('newGame');
+    init(); 
+}
+
+function joinGame(){
+    const code = gameCodeInput.value;
+    socket.emit('joinGame',code);
+    init();
+}
 
 const gameState = {
-    player: {
-        pos: { x: 3, y: 10 },
-        vel: { x: 1, y: 0 },
-        snake: [
-            { x: 1, y: 10 },
-            { x: 2, y: 10 },
-            { x: 3, y: 10 },
-        ]
-    },
-    food: {
-        x: 7,
-        y: 7
-    },
-    gridsize: 20
+    players: [{
+            pos: { x: 3, y: 10 },
+            vel: { x: 1, y: 0 },
+            snake: [
+                { x: 1, y: 10 },
+                { x: 2, y: 10 },
+                { x: 3, y: 10 }, 
+            ]
+        },
+        {
+            pos: { x: 3, y: 1 },
+            vel: { x: 1, y: 0 },
+            snake: [
+                { x: 1, y: 1 },
+                { x: 2, y: 1 },
+                { x: 3, y: 1 }, 
+            ]
+        }],
+    food: {},
+    gridsize: 20,
 };
 
 const init = () => {
+    initialScreen.style.display = 'none';
+    gameScreen.style.display = 'block';
+
     canvas = document.querySelector('#canvas');
     ctx = canvas.getContext('2d');
 
@@ -41,15 +76,16 @@ const init = () => {
     // Setting x1, y1 and x2, y2
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    paintGame(gameState);
+
     document.addEventListener('keydown', (e) => {
-        console.log(e.key);
         socket.emit('keydown',e.key);
     });
+    gameActive = true;
 };
-
-init();
-
+ 
 const paintGame = (state) => { //state -> gameState
+
     ctx.fillStyle = BG_COLOR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -61,7 +97,8 @@ const paintGame = (state) => { //state -> gameState
     // ith cell but we have to multiply cell length to get pixel
     ctx.fillRect(food.x * size, food.y * size, size, size);
 
-    paintPlayer(state.player, size, SNAKE_COLOR);
+    paintPlayer(state.players[0], size, SNAKE_COLOR);
+    paintPlayer(state.players[1], size, SNAKE_COLOR2);
 };
 
 const paintPlayer = (playState, size, color) => {
@@ -73,17 +110,49 @@ const paintPlayer = (playState, size, color) => {
     }
 };
 
-paintGame(gameState);
 
-function handleInit(msg) {
-    console.log(msg);
+function handleInit(number) {
+    playerNumber = number; 
 }
 
 function handleGameState(gameState){
+    if(!gameActive){
+        return;
+    }
     gameState = JSON.parse(gameState);//since gameState will be received as a string
     requestAnimationFrame(()=>paintGame(gameState));
 }
 
-function handleGameOver( ){
-    alert("You lost!")
+function handleGameOver(data){
+    if(!gameActive){
+        return;
+    }
+    data = JSON.parse(data);
+    if(data.winner === playerNumber){
+        alert("You Win!");
+    }else{
+        alert("You lost!");
+    }
+    gameActive = false; 
+}
+
+function handleGameCode(gameCode){
+    gameCodeDisplay.innerText = gameCode;
+}
+
+function handleUnknowGame(){
+    reset();
+    alert("Unknow Game Code!!!");
+}
+function handleTooManyPlayers(){
+    reset();
+    alert("This game is full!!!"); 
+}
+
+function reset(){
+     playerNumber = null;
+     gameCodeInput.value = ""; 
+     gameCodeDisplay.innerText = "";
+     initialScreen.style.display = "block";
+     gameScreen.style.display = "none"; 
 }

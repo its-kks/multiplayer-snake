@@ -13,13 +13,43 @@
             height: 100vh;
             margin: 0;
         }
+        #gameScreen{
+            display: none;
+        }
+        #joinGameButton{
+            margin-top: 10px;
+        }
+        #orLabel{
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <section>
         <div class="container h-100">
+
+            <!-- Initial gameScreen -->
+            <div id="initialScreen" class="h-100">
+                <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                    <h1>Multiplayer Snake</h1>
+                    <br>
+                    <button type="submit" class="btn btn-success" id="newGameButton">
+                        Create New Game
+                    </button>
+                    <div id="orLabel">OR</div>
+                    <div class="form-group">
+                        <input type="text" placeholder="Enter game code" id="gameCodeInput">
+                    </div>
+                    <button type="submit" class="btn btn-success" id="joinGameButton">
+                    Join Game
+                    </button>
+                </div>
+            </div>
+
             <div id="gameScreen" class="h-100">
                 <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                    <h1>Yor game code is: <span id="gameCodeDisplay"></span></h1>
                     <canvas id="canvas"></canvas>
                 </div>
             </div>
