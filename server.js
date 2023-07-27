@@ -130,12 +130,3 @@ try {
 } catch (e) {
   console.error("Server failed to listen " + e);
 }
-
-
-
-
-
-
-
-
-//add to specefic room: socket.join(roomName);
