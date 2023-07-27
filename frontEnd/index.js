@@ -4,7 +4,7 @@ const FOOD_COLOR = '#e66916';
 const SNAKE_COLOR2 = '#d45092';
 
 // // Making a client instance
-const socket = io('http://localhost:3000');
+const socket = io('https://multiplayer-snake-production.up.railway.app/');
 socket.on('init',handleInit);
 socket.on('gameState',handleGameState);
 socket.on('gameOver',handleGameOver);
